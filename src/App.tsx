@@ -1,11 +1,11 @@
 import React from 'react';
-import BarGraph from './components/BarGraph';
+import BarGraph from 'components/BarGraph';
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <BarGraph />
+        <BarGraph></BarGraph>
       </header>
     </div>
   );

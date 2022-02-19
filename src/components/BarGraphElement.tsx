@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import 'styles/BarGraphElement.css';
 
 export interface BarGraphElementProps {
-  height: Number;
+  height: number;
 }
 
 function BarGraphElement(props: BarGraphElementProps) {
-  const { height } = props;
+  const height: number = props.height;
   return (
-    <div>
-      <h1>{height}</h1>
+    <div className="graph-element-container">
+      <div style={{ height: 100 - 10 * height + '%' }}></div>
+      <div className="graph-element" style={{ height: 10 * height + '%' }}>
+        <p>{height}</p>
+      </div>
     </div>
   );
 }

@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import BarGraphElement from './BarGraphElement';
+import BarGraphElement, { BarGraphElementProps } from './BarGraphElement';
 
 export interface BarGraphProps {}
 
 function BarGraph(props: BarGraphProps) {
+  const elementsArray: Array<BarGraphElementProps> = [];
+  for (var i = 1; i <= 10; i++) {
+    elementsArray.push({ height: i });
+  }
 
   return (
     <div>
-      <h1>TODO: Bar Graph</h1>
-      <BarGraphElement height={1}></BarGraphElement>
-      <BarGraphElement height={2}></BarGraphElement>
-      <BarGraphElement height={3}></BarGraphElement>
+      <div className="flexbox-container">
+        {elementsArray.map((props) => {
+          return <BarGraphElement height={props.height}></BarGraphElement>;
+        })}
+      </div>
     </div>
   );
 }

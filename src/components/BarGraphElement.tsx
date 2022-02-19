@@ -6,7 +6,11 @@ export interface BarGraphElementProps {
 
 function BarGraphElement(props: BarGraphElementProps) {
   const { height } = props;
-  return <h1>TODO: Bar Graph Element with size {height}</h1>;
+  return (
+    <div>
+      <h1>{height}</h1>
+    </div>
+  );
 }
 
 export default BarGraphElement;

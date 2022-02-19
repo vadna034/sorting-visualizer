@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import BarGraphElement, { BarGraphElementProps } from './BarGraphElement';
+import BarGraphElement, { BarGraphElementProps } from 'components/BarGraphElement';
+import "styles/BarGraph.css"
 
 export interface BarGraphProps {}
 
@@ -10,8 +11,8 @@ function BarGraph(props: BarGraphProps) {
   }
 
   return (
-    <div>
-      <div className="flexbox-container">
+    <div className="graph">
+      <div className="graph-flexbox-container">
         {elementsArray.map((props) => {
           return <BarGraphElement height={props.height}></BarGraphElement>;
         })}

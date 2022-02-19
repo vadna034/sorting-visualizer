@@ -1,4 +1,10 @@
-.flexbox-container {
+.graph {
+  width: 600px;
+  height: 600px;
+}
+
+.graph-flexbox-container {
   display: flex;
   flex-direction: row;
+  height: 100%;
 }

@@ -1,0 +1,9 @@
+.graph-element-container {
+  flex: 1 1 auto;
+}
+
+.graph-element {
+  background-color: aquamarine;
+  margin: 0px;
+  padding: 0px;
+}

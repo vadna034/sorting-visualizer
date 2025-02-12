@@ -1,15 +1,25 @@
 import React from 'react';
 import { getHeight, GRAPH_ELEMENT_CLASS_NAME } from './BarGraph';
-import { getBubbleSortSwaps, SortResult } from '../utils/Sorters';
+import { getBubbleSortSwaps, getSelectionSortSwaps, SortResult } from '../utils/Sorters';
 
 const CLASS_DEFAULT = "graph-element";
 const CLASS_BEING_SWAPPED = "graph-element-being-swapped";
 const CLASS_BEING_COMPARED = "graph-element-being-compared"
 
+let shouldPause = false;
+let randomizationKey = 0;
+
 export interface ButtonContainerProps {
     addElement: () => void;
     removeElement: () => void;
 };
+
+interface SortAnimation {
+    action: "AddSwappingCSSClass" | "SwapHeights" | "RemoveSwappingCSSClass" | "AddComparingCSSClass";
+    v1: number;
+    v2: number;
+};
+
 
 function ButtonContainer(props: ButtonContainerProps) {
   return (
@@ -19,14 +29,14 @@ function ButtonContainer(props: ButtonContainerProps) {
       <button onClick={props.addElement}>Add Element</button>
       <button onClick={props.removeElement}>Remove Element</button>
       <button onClick={animateSort}>Bubble Sort</button>
-      <button>Start</button>
-      <button>Pause</button>
+      <button onClick={() => shouldPause = false}>Start</button>
+      <button onClick={() => shouldPause = true}>Pause</button>
 
     </div>
   );
 }
 
-function randomizeElements(){
+function randomizeElements(): void{
     let elArr = document.getElementsByClassName(GRAPH_ELEMENT_CLASS_NAME);
     let numElements = elArr.length;
 
@@ -38,66 +48,60 @@ function randomizeElements(){
 
     randomizedEls.forEach((height, idx) => {
         elArr[idx].setAttribute("style", "flex-basis: " + getHeight(height+1, elArr.length))
-
     })
+
+    randomizationKey++;
 }
 
-async function animateSort(){
+async function animateSort(): Promise<void>{
     let elArr = Array.from(document.getElementsByClassName(GRAPH_ELEMENT_CLASS_NAME));
-    let sortResults = getBubbleSortSwaps();
-    console.log(sortResults);
-
-    for(const res of sortResults){
-        switch(res.action){
-            case "compare":
-                await handleCompare(res, elArr);
-                break;
-            case "swap": 
-                await handleSwap(res, elArr);
-                break;
-            default: 
-                throw new Error("Not implemented sorting type");
-        }
+    let animationArr = getSelectionSortSwaps().map(res => getActionsFromSortResult(res)).reduce((a,b) => a.concat(b));
+    
+    for(const animation of animationArr){
+        await handleSortAnimationAndWait(animation, elArr);
     }
 }
 
-async function handleCompare(sortResult: SortResult, elArr: Element[]){
-    if(sortResult.action !== "compare") throw new Error("Invalid Sort Result");
+async function handleSortAnimationAndWait(animation: SortAnimation, elArr: Element[]){
+    let elements = [elArr[animation.v1],elArr[animation.v2]];
+    let [leftHeight, rightHeight] = [elements[0].getAttribute("style"), elements[1].getAttribute("style")];
 
-    let [lIdx,rIdx] = [sortResult.v1, sortResult.v2];
-    let elements = [elArr[lIdx],elArr[rIdx]];
+    switch(animation.action){
+        case "AddComparingCSSClass":
+            elements.forEach(el => {replaceClass(el, CLASS_BEING_COMPARED, CLASS_DEFAULT);});
+            break;
+        case "AddSwappingCSSClass": 
+            elements.forEach(el => {replaceClass(el, CLASS_BEING_SWAPPED, CLASS_DEFAULT);});
+            break;
+        case "SwapHeights": 
+            elements[0].setAttribute("style", rightHeight ?? "");
+            elements[1].setAttribute("style", leftHeight ?? "")
+            break;
+        case "RemoveSwappingCSSClass":
+            elements.forEach(el => {replaceClass(el, CLASS_DEFAULT, CLASS_BEING_SWAPPED);});
+            break;
+    }
 
-    elements.forEach(el => {
-        replaceClass(el, CLASS_BEING_COMPARED, CLASS_DEFAULT);
-    });
-
-    await WaitForSetTime();
-
-    elements.forEach(el => {
-        replaceClass(el, CLASS_DEFAULT, CLASS_BEING_COMPARED)
+    await WaitForSetTime().then(() => {
+        if(animation.action === "AddComparingCSSClass"){
+            elements.forEach(el => {replaceClass(el, CLASS_DEFAULT, CLASS_BEING_COMPARED)});
+        }
     });
 }
 
-async function handleSwap(sortResult: SortResult, elArr: Element[]){
-    if(sortResult.action !== "swap") throw new Error("Invalid Sort Result");
+function getActionsFromSortResult(sortResult: SortResult): SortAnimation[]{
+    let [action, v1, v2] = [sortResult.action, sortResult.v1, sortResult.v2];
 
-    let elements = [elArr[sortResult.v1],elArr[sortResult.v2]];
-    let [leftHeight, rightHeight] = [elements[0].getAttribute("style"), elements[1].getAttribute("style")];
-
-    elements.forEach(el => {
-        replaceClass(el, CLASS_BEING_SWAPPED, CLASS_DEFAULT);
-    });
-    await WaitForSetTime();
-
-    elements[0].setAttribute("style", rightHeight ?? "");
-    elements[1].setAttribute("style", leftHeight ?? "")
-    await WaitForSetTime();
-
-    elements.forEach(el => {
-        replaceClass(el, CLASS_DEFAULT, CLASS_BEING_SWAPPED);
-    });
-
-    await WaitForSetTime();
+    switch(action){
+        case "compare":
+            return [{action: "AddComparingCSSClass", v1: v1, v2: v2}];
+        case "swap": 
+            return [{action: "AddSwappingCSSClass", v1: v1, v2: v2},
+                {action: "SwapHeights", v1: v1, v2: v2},
+                {action: "RemoveSwappingCSSClass", v1: v1, v2: v2}]
+        default: 
+            throw new Error("Not implemented sorting type");
+    }
 }
 
 function replaceClass(el: Element, classToAdd: string, classToRemove: string){
@@ -106,7 +110,9 @@ function replaceClass(el: Element, classToAdd: string, classToRemove: string){
 }
 
 async function WaitForSetTime(){
-    await new Promise(resolve => setTimeout(resolve, 400));
+    do {
+        await new Promise(resolve => setTimeout(resolve, 25));
+    } while(shouldPause)
 }
 
 

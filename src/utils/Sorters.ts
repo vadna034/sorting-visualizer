@@ -30,3 +30,31 @@ export function getBubbleSortSwaps(): SortResult[]{
     
     return res;
 }
+
+export function getSelectionSortSwaps(): SortResult[]{
+    let res: SortResult[] = []
+    
+    let elArr = Array.from(document.getElementsByClassName(GRAPH_ELEMENT_CLASS_NAME));
+    let heightArr = elArr.map(el => el.clientHeight);
+
+    for(let i=0; i<heightArr.length-1; i++){
+        let [minEl, minIdx] = [heightArr[i], i];
+
+        for(let j=i+1; j<heightArr.length; j++){
+            res.push({v1: minIdx, v2: j, action: "compare"});
+
+            if(heightArr[j] < minEl){
+                [minEl, minIdx] = [heightArr[j], j];
+            }
+        }
+
+        if(i !== minIdx){
+            res.push({v1: i, v2: minIdx, action: "swap"});
+            [heightArr[i],heightArr[minIdx]] = [heightArr[minIdx],heightArr[i]];
+        }
+    }
+
+    console.log(res)
+    
+    return res;
+}

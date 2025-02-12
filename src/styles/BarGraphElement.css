@@ -7,3 +7,11 @@
   margin: 0px;
   padding: 0px;
 }
+
+.graph-element-being-compared {
+  background-color: yellow;
+}
+
+.graph-element-being-swapped {
+  background-color: red;
+}

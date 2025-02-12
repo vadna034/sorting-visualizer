@@ -2,12 +2,6 @@ import React from 'react';
 import "styles/BarGraph.css"
 import "styles/BarGraphElement.css"
 
-export const GRAPH_ELEMENT_CLASS_NAME = "graph-element";
-
-export function getHeight(i: number, numEls: number): string{
-  return i/numEls*100 + '%'
-}
-
 export interface BarGraphProps {
   numElements: number;
 }
@@ -35,6 +29,12 @@ function BarGraph(props: BarGraphProps) {
         </div>
       </div>
   );
+}
+
+export const GRAPH_ELEMENT_CLASS_NAME = "graph-element";
+
+export function getHeight(i: number, numEls: number): string{
+  return (10+i/numEls*90) + '%'
 }
 
 export default BarGraph;

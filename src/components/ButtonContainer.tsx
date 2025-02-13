@@ -25,13 +25,20 @@ interface SortAnimation {
 
 
 function ButtonContainer(props: ButtonContainerProps) {
-  return (
+    function changeElementsWrapper(fun: (() => void) | (() => Promise<void>)){
+        sortKey++;
+        let elArr = Array.from(document.getElementsByClassName(GRAPH_ELEMENT_CLASS_NAME));
+        elArr.forEach(el => replaceClass(el, CLASS_DEFAULT));
+        fun();
+    }
+  
+    return (
     <div>
       <div></div>
-      <button onClick={randomizeElements}>Randomize</button>
-      <button onClick={() => {props.addElement(); sortKey++;}}>Add Element</button>
-      <button onClick={() => {props.removeElement(); sortKey++;}}>Remove Element</button>
-      <button onClick={(animateSort)}>Bubble Sort</button>
+      <button onClick={() => changeElementsWrapper(randomizeElements)}>Randomize</button>
+      <button onClick={() => changeElementsWrapper(props.addElement)}>Add Element</button>
+      <button onClick={() => changeElementsWrapper(props.removeElement)}>Remove Element</button>
+      <button onClick={() => changeElementsWrapper(animateSort)}>Bubble Sort</button>
       <button onClick={() => shouldPause = false}>Start</button>
       <button onClick={() => shouldPause = true}>Pause</button>
 
@@ -59,10 +66,7 @@ function randomizeElements(): void{
 async function animateSort(): Promise<void>{
     let elArr = Array.from(document.getElementsByClassName(GRAPH_ELEMENT_CLASS_NAME));
     let animationArr = getSelectionSortSwaps().map(res => getActionsFromSortResult(res)).reduce((a,b) => a.concat(b));
-    sortKey++;
     let id = sortKey
-
-    await WaitForSetTime(id);
     
     for(const animation of animationArr){
         if(id !== sortKey) break;
@@ -92,7 +96,7 @@ async function handleSortAnimationAndWait(animation: SortAnimation, elArr: Eleme
     }
 
     await WaitForSetTime(id).then(() => {
-        if(animation.action === "AddComparingCSSClass"){
+        if(animation.action === "AddComparingCSSClass" && id === sortKey){
             elements.forEach(el => {replaceClass(el, CLASS_DEFAULT)});
         }
     });

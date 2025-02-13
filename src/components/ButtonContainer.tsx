@@ -2,12 +2,15 @@ import React from 'react';
 import { getHeight, GRAPH_ELEMENT_CLASS_NAME } from './BarGraph';
 import { getBubbleSortSwaps, getSelectionSortSwaps, SortResult } from '../utils/Sorters';
 
-const CLASS_DEFAULT = "graph-element";
+const CLASS_DEFAULT = "graph-element-default-color";
 const CLASS_BEING_SWAPPED = "graph-element-being-swapped";
-const CLASS_BEING_COMPARED = "graph-element-being-compared"
+const CLASS_BEING_COMPARED = "graph-element-being-compared";
+const GRAPH_ELEMENT_COLORS = [CLASS_DEFAULT, CLASS_BEING_COMPARED, CLASS_BEING_SWAPPED];
 
 let shouldPause = false;
-let randomizationKey = 0;
+
+export type SortKey = number;
+let sortKey: SortKey = 0;
 
 export interface ButtonContainerProps {
     addElement: () => void;
@@ -26,9 +29,9 @@ function ButtonContainer(props: ButtonContainerProps) {
     <div>
       <div></div>
       <button onClick={randomizeElements}>Randomize</button>
-      <button onClick={props.addElement}>Add Element</button>
-      <button onClick={props.removeElement}>Remove Element</button>
-      <button onClick={animateSort}>Bubble Sort</button>
+      <button onClick={() => {props.addElement(); sortKey++;}}>Add Element</button>
+      <button onClick={() => {props.removeElement(); sortKey++;}}>Remove Element</button>
+      <button onClick={(animateSort)}>Bubble Sort</button>
       <button onClick={() => shouldPause = false}>Start</button>
       <button onClick={() => shouldPause = true}>Pause</button>
 
@@ -50,41 +53,47 @@ function randomizeElements(): void{
         elArr[idx].setAttribute("style", "flex-basis: " + getHeight(height+1, elArr.length))
     })
 
-    randomizationKey++;
+    sortKey++;
 }
 
 async function animateSort(): Promise<void>{
     let elArr = Array.from(document.getElementsByClassName(GRAPH_ELEMENT_CLASS_NAME));
     let animationArr = getSelectionSortSwaps().map(res => getActionsFromSortResult(res)).reduce((a,b) => a.concat(b));
+    sortKey++;
+    let id = sortKey
+
+    await WaitForSetTime(id);
     
     for(const animation of animationArr){
-        await handleSortAnimationAndWait(animation, elArr);
+        if(id !== sortKey) break;
+
+        await handleSortAnimationAndWait(animation, elArr, id);
     }
 }
 
-async function handleSortAnimationAndWait(animation: SortAnimation, elArr: Element[]){
+async function handleSortAnimationAndWait(animation: SortAnimation, elArr: Element[], id: SortKey){
     let elements = [elArr[animation.v1],elArr[animation.v2]];
     let [leftHeight, rightHeight] = [elements[0].getAttribute("style"), elements[1].getAttribute("style")];
 
     switch(animation.action){
         case "AddComparingCSSClass":
-            elements.forEach(el => {replaceClass(el, CLASS_BEING_COMPARED, CLASS_DEFAULT);});
+            elements.forEach(el => {replaceClass(el, CLASS_BEING_COMPARED);});
             break;
         case "AddSwappingCSSClass": 
-            elements.forEach(el => {replaceClass(el, CLASS_BEING_SWAPPED, CLASS_DEFAULT);});
+            elements.forEach(el => {replaceClass(el, CLASS_BEING_SWAPPED);});
             break;
         case "SwapHeights": 
             elements[0].setAttribute("style", rightHeight ?? "");
             elements[1].setAttribute("style", leftHeight ?? "")
             break;
         case "RemoveSwappingCSSClass":
-            elements.forEach(el => {replaceClass(el, CLASS_DEFAULT, CLASS_BEING_SWAPPED);});
+            elements.forEach(el => {replaceClass(el, CLASS_DEFAULT);});
             break;
     }
 
-    await WaitForSetTime().then(() => {
+    await WaitForSetTime(id).then(() => {
         if(animation.action === "AddComparingCSSClass"){
-            elements.forEach(el => {replaceClass(el, CLASS_DEFAULT, CLASS_BEING_COMPARED)});
+            elements.forEach(el => {replaceClass(el, CLASS_DEFAULT)});
         }
     });
 }
@@ -104,15 +113,15 @@ function getActionsFromSortResult(sortResult: SortResult): SortAnimation[]{
     }
 }
 
-function replaceClass(el: Element, classToAdd: string, classToRemove: string){
-    el.classList.remove(classToRemove);
+function replaceClass(el: Element, classToAdd: string){
+    GRAPH_ELEMENT_COLORS.forEach(color => el.classList.remove(color));
     el.classList.add(classToAdd);
 }
 
-async function WaitForSetTime(){
+async function WaitForSetTime(id: SortKey){
     do {
-        await new Promise(resolve => setTimeout(resolve, 25));
-    } while(shouldPause)
+        await new Promise(resolve => setTimeout(resolve, 50));
+    } while(shouldPause && id === sortKey)
 }
 
 

@@ -3,9 +3,12 @@
 }
 
 .graph-element {
-  background-color: aquamarine;
   margin: 0px;
   padding: 0px;
+}
+
+.graph-element-default-color {
+  background-color: aquamarine;
 }
 
 .graph-element-being-compared {

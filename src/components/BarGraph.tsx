@@ -14,7 +14,7 @@ function BarGraph(props: BarGraphProps) {
         <div className="graph-element-container">
             <div style={{height: "100%", display: "flex", flexDirection: "column"}}>
               <div style={{ display: "flex", flexGrow: 1 }}></div>
-                <div className="graph-element" style={{height: "100%", display: "flex", flexBasis: getHeight(i, props.numElements)}}>
+                <div className="graph-element graph-element-default-color" style={{height: "100%", display: "flex", flexBasis: getHeight(i, props.numElements)}}>
                   <p>{i}</p>
             </div>
           </div>

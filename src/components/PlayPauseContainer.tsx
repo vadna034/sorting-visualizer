@@ -11,10 +11,10 @@ export function PlayPauseContainer(props: PlayPauseContainerProps) {
     <div style={{flexDirection: "row"}}>
         <div style={{display: "flex", alignSelf: "center", justifyContent: "center"}}>
             <IconButton>
-            <PlayArrow></PlayArrow>
+                <PlayArrow></PlayArrow>
             </IconButton>
             <IconButton>
-            <PauseCircle></PauseCircle>
+                <PauseCircle></PauseCircle>
             </IconButton>
         </div>
     </div>

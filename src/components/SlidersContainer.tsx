@@ -2,8 +2,8 @@ import { Box, Slider, Typography } from '@mui/material';
 import React from 'react';
 
 export interface SlidersContainerProps {
-    addElement: () => void;
-    removeElement: () => void;
+    changeNumberOfElements: (event: React.SyntheticEvent | Event, value: number | number[]) => void;
+    changeAnmiationSpeed: (event: React.SyntheticEvent | Event, value: number | number[]) => void;
 }
 
 export function SlidersContainer(props: SlidersContainerProps) {
@@ -17,10 +17,11 @@ export function SlidersContainer(props: SlidersContainerProps) {
                     <Slider
                     aria-label="Small steps"
                     defaultValue={10}
-                    step={5}
-                    min={5}
-                    max={100}
+                    step={10}
+                    min={10}
+                    max={200}
                     valueLabelDisplay="auto"
+                    onChangeCommitted={props.changeNumberOfElements}
                     />
                 </Box>
             </div>
@@ -31,11 +32,12 @@ export function SlidersContainer(props: SlidersContainerProps) {
                     </Typography>
                     <Slider
                     aria-label="Small steps"
-                    defaultValue={10}
-                    step={5}
-                    min={5}
+                    defaultValue={5}
+                    step={1}
+                    min={0}
                     max={100}
                     valueLabelDisplay="auto"
+                    onChangeCommitted={props.changeAnmiationSpeed}
                     />
                 </Box>
             </div>

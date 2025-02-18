@@ -5,11 +5,11 @@ import { SlidersContainer } from './components/SlidersContainer';
 import { PlayPauseContainer } from 'components/PlayPauseContainer';
 import { SortButtonsContainer } from 'components/SortButtonsContainer';
 
-
+export const DEFAULT_ANIMATION_SPEED = 5;
 
 function App() {
   const [numElements, updateElements] = useState(10);
-  const [animationSpeed, updateanimationSpeed] = useState(10);
+  const [animationSpeed, updateanimationSpeed] = useState(DEFAULT_ANIMATION_SPEED);
 
   return (
     <div className="App" style={{width: "80%", margin: "2em auto", maxWidth: "1100px"}}>
@@ -27,7 +27,7 @@ function App() {
           <div>
             <SortButtonsContainer />
           </div>
-          <ButtonContainer addElement={() => updateElements(numElements+1)} removeElement={() => updateElements(Math.max(numElements-1,1))}></ButtonContainer>
+          <ButtonContainer></ButtonContainer>
         </div>
       </header>
     </div>

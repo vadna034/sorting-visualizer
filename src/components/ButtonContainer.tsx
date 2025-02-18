@@ -13,8 +13,6 @@ export type SortKey = number;
 let sortKey: SortKey = 0;
 
 export interface ButtonContainerProps {
-    addElement: () => void;
-    removeElement: () => void;
 };
 
 interface SortAnimation {
@@ -35,8 +33,6 @@ function ButtonContainer(props: ButtonContainerProps) {
     return (
     <div>
       <button onClick={() => changeElementsWrapper(randomizeElements)}>Randomize</button>
-      <button onClick={() => changeElementsWrapper(props.addElement)}>Add Element</button>
-      <button onClick={() => changeElementsWrapper(props.removeElement)}>Remove Element</button>
       <button onClick={() => changeElementsWrapper(animateSort)}>Bubble Sort</button>
       <button onClick={() => shouldPause = false}>Start</button>
       <button onClick={() => shouldPause = true}>Pause</button>

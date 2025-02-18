@@ -1,4 +1,5 @@
 import { Box, Slider, Typography } from '@mui/material';
+import { DEFAULT_ANIMATION_SPEED } from 'App';
 import React from 'react';
 
 export interface SlidersContainerProps {
@@ -32,7 +33,7 @@ export function SlidersContainer(props: SlidersContainerProps) {
                     </Typography>
                     <Slider
                     aria-label="Small steps"
-                    defaultValue={5}
+                    defaultValue={DEFAULT_ANIMATION_SPEED}
                     step={1}
                     min={0}
                     max={100}

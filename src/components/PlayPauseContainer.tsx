@@ -3,17 +3,21 @@ import { IconButton, } from '@mui/material';
 import React from 'react';
 
 export interface PlayPauseContainerProps {
-
+    setShouldPause: (val:boolean) => void;
 }
 
 export function PlayPauseContainer(props: PlayPauseContainerProps) {
     return  <>
     <div style={{flexDirection: "row"}}>
         <div style={{display: "flex", alignSelf: "center", justifyContent: "center"}}>
-            <IconButton>
+            <IconButton
+            onClick={() => props.setShouldPause(false)}
+            >
                 <PlayArrow></PlayArrow>
             </IconButton>
-            <IconButton>
+            <IconButton
+                onClick={() => props.setShouldPause(true)}
+            >
                 <PauseCircle></PauseCircle>
             </IconButton>
         </div>

@@ -58,3 +58,24 @@ export function getSelectionSortSwaps(): SortResult[]{
     
     return res;
 }
+
+export function getInsertionSortSwaps(): SortResult[]{
+    let res: SortResult[] = []
+    
+    let elArr = Array.from(document.getElementsByClassName(GRAPH_ELEMENT_CLASS_NAME));
+    let heightArr = elArr.map(el => el.clientHeight);
+
+    for(let i=1; i<heightArr.length; i++){
+        for(let j=i-1; j>=0 && heightArr[j]; j--){
+            res.push({v1: j, v2: j+1, action: "compare"})
+            
+            if(heightArr[j] < heightArr[j+1]) break;
+            else{
+                [heightArr[j],heightArr[j+1]] = [heightArr[j+1],heightArr[j]];
+                res.push({v1: j, v2:j+1, action: "swap"});
+            }
+        }
+    }
+
+    return res;
+}

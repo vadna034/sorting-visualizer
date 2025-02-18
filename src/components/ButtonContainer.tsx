@@ -34,14 +34,12 @@ function ButtonContainer(props: ButtonContainerProps) {
   
     return (
     <div>
-      <div></div>
       <button onClick={() => changeElementsWrapper(randomizeElements)}>Randomize</button>
       <button onClick={() => changeElementsWrapper(props.addElement)}>Add Element</button>
       <button onClick={() => changeElementsWrapper(props.removeElement)}>Remove Element</button>
       <button onClick={() => changeElementsWrapper(animateSort)}>Bubble Sort</button>
       <button onClick={() => shouldPause = false}>Start</button>
       <button onClick={() => shouldPause = true}>Pause</button>
-
     </div>
   );
 }
@@ -124,7 +122,7 @@ function replaceClass(el: Element, classToAdd: string){
 
 async function WaitForSetTime(id: SortKey){
     do {
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 0));
     } while(shouldPause && id === sortKey)
 }
 

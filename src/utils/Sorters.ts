@@ -3,7 +3,8 @@ import { GRAPH_ELEMENT_CLASS_NAME } from "../components/BarGraph";
 export interface SortResult {
     v1: number;
     v2: number;
-    action: "compare" | "swap";
+    action: "compare" | "swap" | "setHeight";
+    height?: number
 }
 
 export function getBubbleSortSwaps(): SortResult[]{
@@ -25,8 +26,6 @@ export function getBubbleSortSwaps(): SortResult[]{
             }
         }
     }
-
-    console.log(res)
     
     return res;
 }
@@ -53,8 +52,6 @@ export function getSelectionSortSwaps(): SortResult[]{
             [heightArr[i],heightArr[minIdx]] = [heightArr[minIdx],heightArr[i]];
         }
     }
-
-    console.log(res)
     
     return res;
 }
@@ -77,7 +74,6 @@ export function getInsertionSortSwaps(): SortResult[]{
         }
     }
 
-    console.log(res);
     return res;
 }
 
@@ -144,7 +140,6 @@ export function getQuickSortSwaps(): SortResult[]{
 
     quickSort(heightArr, 0, heightArr.length-1);
 
-    console.log(res);
     return res;
 }
 
@@ -204,7 +199,7 @@ export function getHeapSortSwaps(): SortResult[]{
 export function getMergeSortSwaps(): SortResult[]{
     let res: SortResult[] = [];
     let elArr = Array.from(document.getElementsByClassName(GRAPH_ELEMENT_CLASS_NAME));
-    let heightArr = elArr.map(el => el.clientHeight);
+    let heightArr = elArr.map(el => Number(el.getAttribute("style")?.slice("flex-basis: ".length,-1)));
 
     function mergeSortInPlace(arr: number[], left = 0, right = arr.length - 1) {
         // Base case: If the array has one or no elements, it's already sorted
@@ -228,25 +223,154 @@ export function getMergeSortSwaps(): SortResult[]{
         let rightArr = arr.slice(mid + 1, right + 1);
         
         let i = 0, j = 0, k = left;
-        
+
+        while(i < leftArr.length && j < rightArr.length){
+            res.push({v1: i+left, v2: j+mid+1, action: "compare"});
+            if(leftArr[i] <= rightArr[j]){
+                i++;
+            } else{
+                j++;
+            }
+        }
+
+        i = 0;
+        j = 0;
+
+        // 0 5 10
         while (i < leftArr.length && j < rightArr.length) {
             if (leftArr[i] <= rightArr[j]) {
+                res.push({v1: k, v2: k, height: leftArr[i], action: "setHeight"});
                 arr[k++] = leftArr[i++];
             } else {
+                res.push({v1: k, v2: k, height: rightArr[j], action: "setHeight"});
                 arr[k++] = rightArr[j++];
             }
         }
         
         while (i < leftArr.length) {
+            res.push({v1: k, v2: k, height: leftArr[i], action: "setHeight"});
             arr[k++] = leftArr[i++];
         }
         while (j < rightArr.length) {
+            res.push({v1: k, v2: k, height: rightArr[j], action: "setHeight"});
             arr[k++] = rightArr[j++];
         }
     }
 
     mergeSortInPlace(heightArr);
-    console.log(heightArr);
+
+    return res;
+}
+
+export function getShellSortSwaps(): SortResult[]{
+    let res: SortResult[] = [];
+    let elArr = Array.from(document.getElementsByClassName(GRAPH_ELEMENT_CLASS_NAME));
+    let heightArr = elArr.map(el => Number(el.getAttribute("style")?.slice("flex-basis: ".length,-1)));
+
+    function sort(arr: number[])
+    {
+        let n = arr.length;
+            for (let gap = Math.floor(n/2); gap > 0; gap = Math.floor(gap/2))
+            {
+        
+                for (let i = gap; i < n; i += 1)
+                {
+                    let temp = arr[i];
+    
+                    let j;
+                    for (j = i; j >= gap && arr[j - gap] > temp; j -= gap){
+                        arr[j] = arr[j - gap];
+                        res.push({v1: j, v2: j-gap, action: "swap"});
+                    }
+    
+                    arr[j] = temp;
+                    res.push({v1: j, v2: j, action: "setHeight", height: temp})
+                                        
+                }
+            }
+            return arr;
+    }
+
+    sort(heightArr);
+
+    return res;
+}
+
+export function getCocktailSortSwaps(): SortResult[] {
+    let res: SortResult[] = [];
+    let elArr = Array.from(document.getElementsByClassName(GRAPH_ELEMENT_CLASS_NAME));
+    let heightArr = elArr.map(el => Number(el.getAttribute("style")?.slice("flex-basis: ".length,-1)));
+     
+    function cocktailSort(a: number[]): void
+    {
+        let isIncreasing = true;
+        let swapped = true;
+        let start = 0;
+        let end = a.length;
+
+    
+        while (swapped === true) {    
+            swapped = false;
+
+            for (let i = start; i < end - 1 && isIncreasing; ++i) {
+                res.push({v1: i, v2: i+1, action: "compare"});
+                if (a[i] > a[i + 1]) {
+                    res.push({v1: i, v2: i+1, action: "swap"});
+                    [a[i], a[i+1]] = [a[i+1],a[i]];
+                    swapped = true;
+                }
+            }
+
+            for (let i = end - 1; i >= start && !isIncreasing; i--) {
+                res.push({v1: i, v2: i+1, action: "compare"});
+                if (a[i] > a[i + 1]) {
+                    res.push({v1: i, v2: i+1, action: "swap"});
+                    [a[i], a[i+1]] = [a[i+1],a[i]];
+                    swapped = true;
+                }
+            }
+    
+    
+            end = isIncreasing ? end - 1 : end;
+            start = !isIncreasing ? start + 1 : start;
+            isIncreasing = !isIncreasing;
+        }
+    }
+
+    cocktailSort(heightArr)
+
+    return res;
+}
+
+export function getGnomeSortSwaps(): SortResult[] {
+    let res: SortResult[] = [];
+    let elArr = Array.from(document.getElementsByClassName(GRAPH_ELEMENT_CLASS_NAME));
+    let heightArr = elArr.map(el => Number(el.getAttribute("style")?.slice("flex-basis: ".length,-1)));
+
+    function gnomeSort(arr: number[]){
+        let pos = 0;
+
+        while(pos < arr.length){
+            if(pos === 0) {
+                pos++;
+                continue;
+            }
+
+            res.push({v1: pos, v2: pos-1, action: "compare"});
+
+            if(pos === 0 || arr[pos] >= arr[pos-1]){
+                pos++;
+            }
+            else{
+                res.push({v1: pos, v2: pos-1, action: "swap"});
+                [arr[pos], arr[pos-1]] = [arr[pos-1],arr[pos]];
+                pos--;
+            }
+        }
+    }
+
+    // Driver method
+    gnomeSort(heightArr);
 
     return res;
 }

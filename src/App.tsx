@@ -3,7 +3,7 @@ import BarGraph, { getHeight, GRAPH_ELEMENT_CLASS_NAME } from './components/BarG
 import { SlidersContainer } from './components/SlidersContainer';
 import { PlayPauseContainer } from 'components/PlayPauseContainer';
 import { SortButtonsContainer } from 'components/SortButtonsContainer';
-import { getSelectionSortSwaps, SortResult } from 'utils/Sorters';
+import { SortResult } from 'utils/Sorters';
 
 export const DEFAULT_ANIMATION_SPEED = 5;
 
@@ -19,9 +19,10 @@ export type SortKey = number;
 let sortKey: SortKey = 0;
 
 interface SortAnimation {
-  action: "AddSwappingCSSClass" | "SwapHeights" | "RemoveSwappingCSSClass" | "AddComparingCSSClass";
+  action: "AddSwappingCSSClass" | "SwapHeights" | "RemoveSwappingCSSClass" | "AddComparingCSSClass" | "SetHeight";
   v1: number;
   v2: number;
+  height?: number;
 };
 
 function App() {
@@ -113,6 +114,8 @@ async function handleSortAnimationAndWait(animation: SortAnimation, elArr: Eleme
         case "RemoveSwappingCSSClass":
             elements.forEach(el => {replaceClass(el, CLASS_DEFAULT);});
             break;
+        case "SetHeight": 
+            elements[0].setAttribute("style", "flex-basis: " + (animation.height?.toString() ?? "") + "%")
     }
 
     await WaitForSetTime(id).then(() => {
@@ -123,7 +126,7 @@ async function handleSortAnimationAndWait(animation: SortAnimation, elArr: Eleme
 }
 
 function getActionsFromSortResult(sortResult: SortResult): SortAnimation[]{
-    let [action, v1, v2] = [sortResult.action, sortResult.v1, sortResult.v2];
+    let [action, v1, v2, height] = [sortResult.action, sortResult.v1, sortResult.v2, sortResult.height];
 
     switch(action){
         case "compare":
@@ -132,6 +135,10 @@ function getActionsFromSortResult(sortResult: SortResult): SortAnimation[]{
             return [{action: "AddSwappingCSSClass", v1: v1, v2: v2},
                 {action: "SwapHeights", v1: v1, v2: v2},
                 {action: "RemoveSwappingCSSClass", v1: v1, v2: v2}]
+        case "setHeight": 
+            return [{action: "AddSwappingCSSClass", v1: v1, v2: v1},
+              {action: "SetHeight", v1: v1, v2: v1, height: height},
+              {action: "RemoveSwappingCSSClass", v1: v1, v2: v1}]
         default: 
             throw new Error("Not implemented sorting type");
     }

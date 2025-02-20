@@ -88,17 +88,22 @@ export function getQuickSortSwaps(): SortResult[]{
     }
 
     function partition(arr: number[], l: number, h: number){
-        let [i1,i2,i3] = [getRandomIndex(l, h), getRandomIndex(l,h), getRandomIndex(l,h)];
-        let [a,b,c] = [arr[i1],arr[i2],arr[i3]];
         let medianIndex;
 
-        res.push({v1: i1, v2: i2, action: "compare"});
-        if(a < b){
-            res.push({v1: i1, v2: i3, action: "compare"});
-            medianIndex = a > c ? i1 : i3;
+        if(h-l >= 5){
+            let [i1,i2,i3] = [getRandomIndex(l, h), getRandomIndex(l,h), getRandomIndex(l,h)];
+            let [a,b,c] = [arr[i1],arr[i2],arr[i3]];
+
+            res.push({v1: i1, v2: i2, action: "compare"});
+            if(a < b){
+                res.push({v1: i1, v2: i3, action: "compare"});
+                medianIndex = a > c ? i1 : i3;
+            } else{
+                res.push({v1: i2, v2: i3, action: "compare"});
+                medianIndex = b > c ? i2 : i3;
+            }
         } else{
-            res.push({v1: i2, v2: i3, action: "compare"});
-            medianIndex = b > c ? i2 : i3;
+            medianIndex = h;
         }
 
         if(medianIndex !== h){
@@ -278,14 +283,18 @@ export function getShellSortSwaps(): SortResult[]{
                     let temp = arr[i];
     
                     let j;
-                    for (j = i; j >= gap && arr[j - gap] > temp; j -= gap){
+                    for (j = i; j >= gap; j -= gap){
+                        res.push({v1: j-gap, v2: i, action: "compare"})
+
+                        if(arr[j - gap] <= temp){
+                            break;
+                        }
+
                         arr[j] = arr[j - gap];
                         res.push({v1: j, v2: j-gap, action: "swap"});
                     }
     
-                    arr[j] = temp;
-                    res.push({v1: j, v2: j, action: "setHeight", height: temp})
-                                        
+                    arr[j] = temp;                                        
                 }
             }
             return arr;
